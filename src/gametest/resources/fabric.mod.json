@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "smarter-golems-test",
+  "version": "1.0.0",
+  "name": "Smarter Golems Tests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "io.github.faremir.smartergolems.SmarterGolemsTests"
+    ]
+  }
+}
