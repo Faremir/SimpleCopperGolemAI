@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "smarter-golems",
+	"version": "${version}",
+	"name": "Smarter Golems",
+	"description": "Lightweight addition to Copper Golem AI that remembers the last picked item and successful destination chest to reduce unnecessary searches.",
+	"authors": [
+		{
+			"name" : "Faremir",
+			"contact" : {
+				"email" : "j.faremir.b@gmail.com",
+				"homepage" : "https://github.com/Faremir"
+			}
+		}
+	],
+	"contact": {
+		"homepage": "https://github.com/Faremir/SimpleCopperGolemAI/issues",
+		"sources": "https://github.com/Faremir/SimpleCopperGolemAI"
+	},
+	"license": "Polyform-Shield-1.0.0",
+	"icon": "assets/smarter-golems/icon_s.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.faremir.smartergolems.SmarterGolemsFabricMod"
+		]
+	},
+	"mixins": [
+		"smarter-golems.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "io.github.faremir.smartergolems.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"TransportItemsBetweenContainersMixin",
+		"accessor.TransportItemsBetweenContainersAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
