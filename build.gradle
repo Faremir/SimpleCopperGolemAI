@@ -1,6 +1,11 @@
+import me.modmuss50.mpp.ReleaseType
+import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
+
+
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
+	id 'me.modmuss50.mod-publish-plugin' version "2.2.1"
+//	id 'maven-publish'
 }
 
 repositories {
@@ -23,12 +28,13 @@ dependencies {
 fabricApi {
 	configureTests {
 		createSourceSet = true
-		modId = "simple-coppergolem-ai-test"
+		modId = "smarter-golems-test"
 		enableGameTests = true
 		enableClientGameTests = false
 		eula = true
 	}
 }
+
 processResources {
 	def version = project.version
 	def loaderVersion = project.property("loader_version")
@@ -52,37 +58,66 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
-	def projectName = project.name
+	def projectName = project.mod_id
+	def minecraftVersion = project.minecraft_version
+
+	archiveBaseName = projectName
+	archiveVersion = "${project.version}+mc${minecraftVersion}"
+
 	inputs.property "projectName", projectName
+	inputs.property "minecraftVersion", minecraftVersion
 
 	from("LICENSE") {
-		rename { "${it}_$projectName"}
+		rename { "${it}_${projectName}" }
 	}
 }
 
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
+publishMods {
+	def releaseType = providers.gradleProperty("releaseType").getOrElse("stable").toLowerCase()
+	def releaseTag = "v${project.version}+mc${project.minecraft_version}"
+
+	file = jar.archiveFile
+	changelog = "See the GitHub release notes."
+	type = switch (releaseType) {
+		case "alpha" -> ReleaseType.ALPHA
+		case "beta" -> ReleaseType.BETA
+		default -> ReleaseType.STABLE
+	}
+	modLoaders.add("fabric")
+
+	github {
+		repository = "Faremir/SimpleCopperGolemAI"
+		accessToken = providers.environmentVariable("GITHUB_TOKEN")
+		tagName = releaseTag
+		commitish = providers.environmentVariable("GITHUB_REF_NAME")
 	}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+	modrinth {
+		projectId = "P7IsBrm2"
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		minecraftVersions.add(project.minecraft_version)
+		environment = ModrinthEnvironment.SERVER_ONLY
 	}
 }
+
+//// TODO configure the maven publication
+//publishing {
+//	publications {
+//		create("mavenJava", MavenPublication) {
+//			from components.java
+//		}
+//	}
+//
+//	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+//	repositories {
+//		// Add repositories to publish to here.
+//		// Notice: This block does NOT have the same function as the block in the top level.
+//		// The repositories here will be used for publishing your artifact, not for
+//		// retrieving dependencies.
+//	}
+//}
