@@ -1,40 +1,86 @@
 # Smarter Golems
 
-Smarter Golems is a lightweight Minecraft mod that slightly improves the vanilla Copper Golem item transport behavior.
+[![Fabric](https://img.shields.io/badge/Loader-Fabric-DBD0B4)](https://fabricmc.net/)
+[![Static Badge](https://img.shields.io/badge/Mod%20Menu-134BFF)](https://modrinth.com/mod/modmenu)
 
-The mod gives each Copper Golem a small amount of memory when moving items between Copper Chests and normal chests. This allows it to reuse successful item-to-chest routes instead of repeatedly starting from scratch.
+Give your Copper Golems a little memory.
+
+**Smarter Golems** adds small improvements to the Copper Golem item and chest handling behavior, making them useful for
+early/mid-game storage system solutions. It keeps the vanilla behavior intact and only adds a couple of useful
+preferences on top.
 
 ## Features
 
-- Remembers the last item picked from a Copper Chest.
-- Remembers the last normal chest where that item was successfully deposited.
-- When visiting a Copper Chest again, looks for the previously picked item first instead of automatically taking the first non-empty slot.
-- When that item is picked again, prefers the previously successful destination chest.
-- Falls back to the normal vanilla behavior when the preferred item or chest cannot be used.
-- Keeps the memory separately for each Copper Golem.
-- Does not store chest contents or maintain a global item-to-chest mapping.
+### 🧠 Remember Picked Items
 
-The goal is not to replace or redesign the Copper Golem AI. The mod only adds a small preference to the existing behavior.
+Copper Golems can remember the **last item they picked up from a Copper Chest**.
 
-## How it works
+When they return to that chest, they will look for that item first instead of always starting from the first available
+item.
 
-When a Copper Golem picks an item from a Copper Chest, it remembers that item.
+If the remembered item is no longer there, the golem simply continues with its normal behavior.
 
-When it successfully deposits the item into a normal chest, it remembers that chest.
+### 📦 Remember Destination Chests
 
-When the golem later searches a Copper Chest for another item, the remembered item is preferred if it is available in that chest. If it is picked, the golem then prefers the normal chest where that item was previously deposited.
+Copper Golems can also remember the **last chest where they successfully deposited an item**.
 
-If the preferred item or chest is unavailable, the golem falls back to the normal Minecraft behavior.
+When they pick up that same item again, they will try the remembered chest first instead of searching for a destination
+from scratch.
 
-The memory is intentionally temporary and lightweight. Nothing is stored in the world, in a block, or in a separate database.
+If the chest is unavailable or cannot accept the item, normal chest searching takes over.
+
+<sub>These are two independent options and can be enabled or disabled separately.</sub>
+
+## ⚙️ Configuration
+
+Smarter Golems has two configuration options:
+
+* **Remember Picked Items**
+  Remembers the last item picked from a Copper Chest and looks for it first the next time that chest is searched.
+
+* **Remember Destination Chests**
+  Remembers the last chest used for an item and tries it first when that same item is picked up again.
+
+#### In-game settings
+
+The configuration screen is available through [Mod Menu](https://modrinth.com/mod/modmenu).
+
+If you have Mod Menu installed, open the **Smarter Golems** configuration from the Mods screen.
+
+**Mod Menu is optional.** Smarter Golems works without it.
+
+#### Without Mod Menu
+
+If you don't use Mod Menu, the configuration can still be changed manually in the mod's configuration file:
+
+`config/smartergolems.json`
+
+#### Reloading the configuration
+
+The configuration can be reloaded without restarting the game or server:
+
+```text
+/smartergolems reload
+```
+
+The command requires moderator permissions and can be used both on dedicated servers and in singleplayer.
+
+## 💡 Designed to Stay Simple
+
+Smarter Golems builds on the vanilla Copper Golem instead of replacing its existing behavior. The mod adds small,
+focused improvements that make Copper Golems more useful while keeping their familiar behavior and mechanics intact.
+
+When an added behavior cannot be used, the Copper Golem continues using its normal vanilla behavior.
 
 ## Contributing
 
 Bug reports, suggestions and pull requests are welcome.
 
-The project is intentionally kept small and focused. Contributions should follow the existing approach of making targeted changes to the vanilla Copper Golem behavior rather than introducing unnecessary systems or dependencies.
+The project is intentionally kept small and focused. Contributions should follow the existing approach of making
+targeted changes to the vanilla Copper Golem behavior rather than introducing unnecessary systems or dependencies.
 
-For larger changes, opening an issue first is recommended so the proposed approach can be discussed before implementation.
+For larger changes, opening an issue first is recommended so the proposed approach can be discussed before
+implementation.
 
 ## License
 
