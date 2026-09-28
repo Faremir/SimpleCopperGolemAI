@@ -8,12 +8,30 @@ plugins {
     id 'me.modmuss50.mod-publish-plugin' version "2.2.1"
 }
 
-repositories {}
+repositories {
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "smarter-golems" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    clientCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    localRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 fabricApi {
@@ -39,7 +57,7 @@ processResources {
         expand(
                 "version": version,
                 "loader_version": loaderVersion,
-                "minecraft_version": minecraftVersion
+                "minecraft_version": minecraftVersion,
         )
     }
 }
