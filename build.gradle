@@ -1,123 +1,104 @@
 import me.modmuss50.mpp.ReleaseType
 import me.modmuss50.mpp.platforms.modrinth.ModrinthEnvironment
 
+import java.util.regex.Pattern
 
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'me.modmuss50.mod-publish-plugin' version "2.2.1"
-//	id 'maven-publish'
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'me.modmuss50.mod-publish-plugin' version "2.2.1"
 }
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-}
+repositories {}
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 fabricApi {
-	configureTests {
-		createSourceSet = true
-		modId = "smarter-golems-test"
-		enableGameTests = true
-		enableClientGameTests = false
-		eula = true
-	}
+    configureTests {
+        createSourceSet = true
+        modId = "smarter-golems-test"
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
 }
 
 processResources {
-	def version = project.version
-	def loaderVersion = project.property("loader_version")
-	def minecraftVersion = project.property("minecraft_version")
+    def version = project.version
+    def loaderVersion = project.property("loader_version")
+    def minecraftVersion = project.property("minecraft_version")
 
-	inputs.property "version", version
-	inputs.property "loader_version", loaderVersion
-	inputs.property "minecraft_version", minecraftVersion
+    inputs.property "version", version
+    inputs.property "loader_version", loaderVersion
+    inputs.property "minecraft_version", minecraftVersion
 
-	filesMatching("fabric.mod.json") {
-		expand(
-				"version": version,
-				"loader_version": loaderVersion,
-				"minecraft_version": minecraftVersion
-		)
-	}
+    filesMatching("fabric.mod.json") {
+        expand(
+                "version": version,
+                "loader_version": loaderVersion,
+                "minecraft_version": minecraftVersion
+        )
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+    it.options.release = 25
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
-	def projectName = project.mod_id
-	def minecraftVersion = project.minecraft_version
+    def projectName = project.mod_id
+    def minecraftVersion = project.minecraft_version
 
-	archiveBaseName = projectName
-	archiveVersion = "${project.version}+mc${minecraftVersion}"
+    archiveBaseName = projectName
+    archiveVersion = "${project.version}+mc${minecraftVersion}"
 
-	inputs.property "projectName", projectName
-	inputs.property "minecraftVersion", minecraftVersion
+    inputs.property "projectName", projectName
+    inputs.property "minecraftVersion", minecraftVersion
 
-	from("LICENSE") {
-		rename { "${it}_${projectName}" }
-	}
+    from("LICENSE") {
+        rename { "${it}_${projectName}" }
+    }
 }
 
 publishMods {
-	def releaseType = providers.gradleProperty("releaseType").getOrElse("stable").toLowerCase()
-	def releaseTag = "v${project.version}+mc${project.minecraft_version}"
+    def releaseType = providers.gradleProperty("releaseType").getOrElse("stable").toLowerCase()
+    def releaseTag = "v${project.version}+mc${project.minecraft_version}"
+    def changelogText = file("CHANGELOG.md").getText("UTF-8")
+    def changelogVersion = Pattern.quote(project.version.toString())
+    def changelogEntry = changelogText.find(/(?ms)^## \[${changelogVersion}\].*?(?=^## \[|\z)/)
 
-	file = jar.archiveFile
-	changelog = "See the GitHub release notes."
-	type = switch (releaseType) {
-		case "alpha" -> ReleaseType.ALPHA
-		case "beta" -> ReleaseType.BETA
-		default -> ReleaseType.STABLE
-	}
-	modLoaders.add("fabric")
+    if (changelogEntry == null) {
+        throw new GradleException("CHANGELOG.md does not contain an entry for version ${project.version}.")
+    }
 
-	github {
-		repository = "Faremir/SimpleCopperGolemAI"
-		accessToken = providers.environmentVariable("GITHUB_TOKEN")
-		tagName = releaseTag
-		commitish = providers.environmentVariable("GITHUB_REF_NAME")
-	}
+    file = jar.archiveFile
+    changelog = changelogEntry.trim()
+    type = switch (releaseType) {
+        case "alpha" -> ReleaseType.ALPHA
+        case "beta" -> ReleaseType.BETA
+        default -> ReleaseType.STABLE
+    }
+    modLoaders.add("fabric")
 
-	modrinth {
-		projectId = "P7IsBrm2"
-		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add(project.minecraft_version)
-		environment = ModrinthEnvironment.SERVER_ONLY
-	}
+    github {
+        repository = "Faremir/SimpleCopperGolemAI"
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        tagName = releaseTag
+        commitish = providers.environmentVariable("GITHUB_REF_NAME")
+    }
+
+    modrinth {
+        projectId = "P7IsBrm2"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add(project.minecraft_version)
+        environment = ModrinthEnvironment.SERVER_ONLY
+    }
 }
-
-//// TODO configure the maven publication
-//publishing {
-//	publications {
-//		create("mavenJava", MavenPublication) {
-//			from components.java
-//		}
-//	}
-//
-//	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-//	repositories {
-//		// Add repositories to publish to here.
-//		// Notice: This block does NOT have the same function as the block in the top level.
-//		// The repositories here will be used for publishing your artifact, not for
-//		// retrieving dependencies.
-//	}
-//}
