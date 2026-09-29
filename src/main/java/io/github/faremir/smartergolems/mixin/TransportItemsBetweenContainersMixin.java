@@ -1,5 +1,6 @@
 package io.github.faremir.smartergolems.mixin;
 
+import io.github.faremir.smartergolems.config.SmarterGolemsConfigManager;
 import io.github.faremir.smartergolems.mixin.accessor.TransportItemsBetweenContainersAccessor;
 
 import net.minecraft.core.BlockPos;
@@ -107,6 +108,10 @@ public abstract class TransportItemsBetweenContainersMixin {
      */
     @Inject(method = "getTransportTarget", at = @At("HEAD"), cancellable = true)
     private void tryUseLastChest(ServerLevel level, PathfinderMob body, CallbackInfoReturnable<Optional<TransportItemTarget>> cir) {
+        if (!SmarterGolemsConfigManager.get().isPreferredChestDepositEnabled()) {
+            return;
+        }
+
         if (body.getMainHandItem().isEmpty() || this.smarterGolems$lastChest == null || body.getMainHandItem().getItem() != this.smarterGolems$lastPickedItem) {
             return;
         }
@@ -136,6 +141,10 @@ public abstract class TransportItemsBetweenContainersMixin {
      */
     @Redirect(method = "pickUpItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/TransportItemsBetweenContainers;pickupItemFromContainer(Lnet/minecraft/world/Container;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack pickupLastItem(Container container) {
+        if (!SmarterGolemsConfigManager.get().isPreferredItemPickupEnabled()) {
+            return TransportItemsBetweenContainersAccessor.smarterGolems$pickupItemFromContainer(container);
+        }
+
         Item preferredItem = this.smarterGolems$lastPickedItem;
 
         if (preferredItem != null) {

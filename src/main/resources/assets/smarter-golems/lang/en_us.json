@@ -1,0 +1,10 @@
+{
+    "smarter-golems.commands.reload.success": "Smarter Golems configuration reloaded.",
+    "smarter-golems.commands.reload.failure": "Failed to reload Smarter Golems configuration: %s.",
+    "smarter-golems.settings.title": "Smarter Golems",
+    "smarter-golems.settings.memory.category": "Copper Golem Memory",
+    "smarter-golems.settings.memory.category.remember_picked_items.option": "Remember Picked Items",
+    "smarter-golems.settings.memory.category.remember_picked_items.tooltip": "The Copper Golem remembers the last item it picked up and looks for it again in the same copper chest during its next pickup cycle.",
+    "smarter-golems.settings.memory.category.remember_destination_chests.option": "Remember Destination Chests",
+    "smarter-golems.settings.memory.category.remember_destination_chests.tooltip": "The Copper Golem remembers the chest where it deposited an item and skips the normal chest search when it picks up the same item again."
+}
