@@ -1,0 +1,25 @@
+name: Delete feature branch after stable merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  delete-feature-branch:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'feature/') &&
+      startsWith(github.event.pull_request.base.ref, 'stable/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete feature branch
+        run: |
+          gh api \
+            --method DELETE \
+            "/repos/${{ github.repository }}/git/refs/heads/${{ github.event.pull_request.head.ref }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
