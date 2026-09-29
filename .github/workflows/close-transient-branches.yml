@@ -1,8 +1,10 @@
-name: Delete feature branch after stable merge
+name: Delete temporary branch after stable merge
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
+    branches:
+      - 'stable/**'
 
 permissions:
   contents: write
@@ -11,8 +13,10 @@ jobs:
   delete-feature-branch:
     if: >
       github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.head.ref, 'feature/') &&
-      startsWith(github.event.pull_request.base.ref, 'stable/')
+      (
+        startsWith(github.event.pull_request.head.ref, 'feature/') || 
+        startsWith(github.event.pull_request.head.ref, 'backport/')
+      )
     runs-on: ubuntu-latest
 
     steps:
