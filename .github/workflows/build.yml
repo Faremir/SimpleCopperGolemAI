@@ -2,9 +2,13 @@ name: Build
 
 on:
   pull_request:
-  push:
     branches:
       - dev
+      - 'stable/**'
+  push:
+    branches:
+      - 'feature/**'
+      - 'backport/**'
       - 'alpha/**'
       - 'beta/**'
       - 'stable/**'

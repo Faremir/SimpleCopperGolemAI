@@ -17,13 +17,6 @@ import java.util.Set;
 @Mixin(TransportItemsBetweenContainers.class)
 public interface TransportItemsBetweenContainersAccessor {
 
-    @Invoker("isTargetValidToPick")
-    @Nullable
-    TransportItemsBetweenContainers.TransportItemTarget smarterGolems$isTargetValidToPick(PathfinderMob body, Level level, BlockEntity blockEntity, Set<GlobalPos> visitedPositions, Set<GlobalPos> unreachablePositions, AABB targetBlockSearchArea);
-
-    @Invoker("getTargetSearchArea")
-    AABB smarterGolems$getTargetSearchArea(PathfinderMob body);
-
     @Invoker("getVisitedPositions")
     static Set<GlobalPos> smarterGolems$getVisitedPositions(PathfinderMob body) {
         throw new AssertionError("Untransformed @Invoker");
@@ -38,4 +31,11 @@ public interface TransportItemsBetweenContainersAccessor {
     static ItemStack smarterGolems$pickupItemFromContainer(Container container) {
         throw new AssertionError("Untransformed @Invoker");
     }
+
+    @Invoker("isTargetValidToPick")
+    @Nullable
+    TransportItemsBetweenContainers.TransportItemTarget smarterGolems$isTargetValidToPick(PathfinderMob body, Level level, BlockEntity blockEntity, Set<GlobalPos> visitedPositions, Set<GlobalPos> unreachablePositions, AABB targetBlockSearchArea);
+
+    @Invoker("getTargetSearchArea")
+    AABB smarterGolems$getTargetSearchArea(PathfinderMob body);
 }
