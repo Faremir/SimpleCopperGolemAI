@@ -1,0 +1,32 @@
+name: Rebase dev onto stable
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'stable/**'
+
+permissions:
+  contents: write
+
+jobs:
+  rebase:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'feature/')
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Rebase dev
+        run: |
+          git fetch origin dev "${{ github.event.pull_request.base.ref }}"
+
+          git switch dev
+          git rebase "origin/${{ github.event.pull_request.base.ref }}"
+
+          git push --force-with-lease origin dev
